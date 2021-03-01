@@ -1,0 +1,95 @@
+﻿<style>
+    .nodeText {
+        font: italic 25px serif;
+    }
+</style>
+
+<circle cx="@startX" cy="@startY" r="@radius" stroke="pink" stroke-width="4" fill="purple" />
+<text x="@startX" y="@startY" text-anchor="middle" stroke="white" stroke-width="1px" class="nodeText">
+    @CurrentPreOrder.FirstOrDefault()?.Key
+</text>
+
+
+@for (int i = 0; i < CurrentPreOrder.Count; i++)
+{
+    if (i == 0)
+    {
+        placementOfNodes = new Dictionary<int, Placement>();
+        placementOfNodes.Add(CurrentPreOrder.FirstOrDefault().Key, new Placement(startX, startY));
+        continue;
+    }
+    var node = CurrentPreOrder[i];
+    var parentPlacement = placementOfNodes[node.Parent.Key];
+
+    int newPlacementX = 0;
+    int newPlacementY = 0;
+
+    if (node.Parent.LeftChild == node)
+    {
+        var calcPlace = parentPlacement.x - CalcPlacementAccordingToParentX(parentPlacement.x);
+        newPlacementX = calcPlace < 0 ? radius + 4 : calcPlace;
+        newPlacementY = parentPlacement.y + newLineAbstand;
+    }
+    else
+    {
+        var calcPlace = parentPlacement.x + CalcPlacementAccordingToParentX(parentPlacement.x);
+        newPlacementX = calcPlace >= startX * 2 ? (startX * 2) - radius - 4 : calcPlace;
+        newPlacementY = parentPlacement.y + newLineAbstand;
+    }
+    int parentPlacementYLine = parentPlacement.y + radius;
+
+    <line x1="@parentPlacement.x" y1="@parentPlacementYLine" x2="@newPlacementX" y2="@newPlacementY" style="stroke:rgb(0,0,0);stroke-width:2" />
+    <circle cx="@newPlacementX" cy="@newPlacementY" r="@radius" stroke="pink" stroke-width="4" fill="purple" />
+    <text><text x="@newPlacementX" y="@newPlacementY" text-anchor="middle" stroke="white" stroke-width="1px" class="nodeText">@node.Key</text></text>
+
+    placementOfNodes.Add(node.Key, new Placement(newPlacementX, newPlacementY));
+}
+
+
+@code {
+    private int fullX = 1500;
+    private int startX = 750;
+    private int startY = 54;
+    private int radius = 30;
+    private int newLineAbstand = 80;
+
+
+    [Parameter]
+    public List<Core.BinaryTreeNode> CurrentPreOrder { get; set; } = new List<Core.BinaryTreeNode>();
+
+    private Dictionary<int, Placement> placementOfNodes = new Dictionary<int, Placement>();
+
+    public BinTreeSvg()
+    {
+
+    }
+
+    public class Placement
+    {
+        public int x;
+        public int y;
+
+        public Placement(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    private int CalcPlacementAccordingToParentX(int parentPlacementX)
+    {
+        if (parentPlacementX == startX)
+        {
+            return startX / 2;
+        }
+
+        if (parentPlacementX > startX)
+        {
+            return (parentPlacementX - startX) / 2;
+        }
+        else
+        {
+            return (startX - parentPlacementX) / 2;
+        }
+    }
+}

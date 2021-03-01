@@ -1,0 +1,74 @@
+﻿@page "/binarytree"
+
+<h1>Binary Tree</h1>
+
+<div class="input-group">
+    <span class="input-group-addon"><input type="number" placeholder="Add Key" @bind="insertValueInput" class="form-control" /> </span>
+    <button class="btn btn-primary" @onclick="InsertValue">Add Key</button>
+    <button class="btn btn-primary" @onclick="InsertRandom">Add Random Key</button>
+    <button class="btn btn-primary" @onclick="randomTree">Draw Random Tree</button>
+</div>
+
+<div class="input-group">
+    <span class="input-group-addon"><input type="number" placeholder="Remove Key" @bind="removeKeyValueInput" class="form-control" /> </span>
+    <button class="btn btn-primary" @onclick="RemoveKey">Remove Key</button>
+    <button class="btn btn-primary" @onclick="ResetTree">Reset Tree</button>
+</div>
+
+<SvgHolder>
+    <BinTreeSvg CurrentPreOrder="binaryTree.PreOrderAllNodes()" />
+</SvgHolder>
+
+@code {
+    private Core.BinaryTree binaryTree = new Core.BinaryTree();
+
+    private string insertValueInput;
+    private string removeKeyValueInput;
+
+    public BinaryTreeVis()
+    {
+        randomTree();
+    }
+
+    private void InsertRandom()
+    {
+        var rand = new Random();
+        var randomNode = rand.Next(0, 100);
+        binaryTree.Insert(randomNode);
+    }
+
+    private void ResetTree()
+    {
+        binaryTree = new Core.BinaryTree();
+    }
+
+    private void InsertValue()
+    {
+        if (!string.IsNullOrEmpty(insertValueInput))
+        {
+            int insertToInt = Int32.Parse(insertValueInput);
+            binaryTree.Insert(insertToInt);
+            insertValueInput = string.Empty;
+        }
+    }
+
+    protected void RemoveKey()
+    {
+        if (!string.IsNullOrEmpty(removeKeyValueInput))
+        {
+            int removeToInt = Int32.Parse(removeKeyValueInput);
+            binaryTree.Remove(removeToInt);
+            removeKeyValueInput = string.Empty;
+        }
+    }
+
+    protected void randomTree()
+    {
+        binaryTree = null;
+        binaryTree = new Core.BinaryTree();
+        for (int i = 0; i < 10; i++)
+        {
+            InsertRandom();
+        }
+    }
+}
